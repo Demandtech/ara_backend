@@ -67,7 +67,7 @@ def category_product(request, category):
     except Product.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    paginator = PageNumberPagination()
+    paginator = Pagination()
     paginator.page_size = limit
     paginator.page = page
     
@@ -115,7 +115,7 @@ def search_products(request):
     else:
         results = []
 
-    paginator = PageNumberPagination()
+    paginator = Pagination()
     paginator.page_size = limit
     paginated_products = paginator.paginate_queryset(results, request)
     current_page = paginator.page.number
@@ -153,7 +153,7 @@ def filtered_products(request):
     if max_price is not None:
         products = products.filter(price__lte=max_price)
 
-    paginator = PageNumberPagination()
+    paginator = Pagination()
     paginator.page_size = limit
     paginated_products = paginator.paginate_queryset(products, request)
 
