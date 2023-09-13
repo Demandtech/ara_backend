@@ -1,0 +1,109 @@
+from .models import Cart
+from .serializers import CartSerializer
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def cart(request):
+    user = request.user
+    if request.method == 'POST':
+        existing_cart_item = Cart.objects.filter(
+            user=user, 
+            product_id=request.data['product_id'], 
+            color=request.data['color']).first()
+      
+        if existing_cart_item:
+            return Response({"message": "Item already in the cart!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        serializer = CartSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response({"message":"Item add successfully!"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    carts = user.cart_set.all()
+    total_items = len(carts)
+    cart_subtotal = sum(cart.subtotal for cart in carts)
+    serializer = CartSerializer(carts, many=True)
+    return Response({"cart": serializer.data, "total_items":total_items, "subtotal":cart_subtotal}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE', 'PUT'])
+@permission_classes([IsAuthenticated])
+def remove_cart(request, pk):
+    user = request.user
+    if request.method == 'DELETE':
+        try:
+            cart_item = user.cart_set.get(id=pk)
+            cart_item.delete()
+            return Response({"message":"Cart item deleted"}, status=status.HTTP_200_OK)
+        except Cart.DoesNotExist:
+            return Response({"message":"Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
+    try: 
+        cart = Cart.objects.get(id=pk)
+    except Cart.DoesNotExist:
+        return Response({"message": "cart with the provided ID does not exist."})
+    serializer = CartSerializer(cart, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "Cart item updated!"}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST', 'PUT'])
+@permission_classes([IsAuthenticated])
+def update_cart_list(request):
+
+    user = request.user
+    items_data = request.data
+
+    if request.method == 'POST':
+        
+
+        new_cart_items = []
+
+        for item_data in items_data:
+
+            existing_cart_item = Cart.objects.filter(
+            user=user, 
+            product_id=item_data['product_id'], 
+            color=item_data['color']).first()
+
+            if existing_cart_item:
+                return Response({"message": "Item already in the cart!"}, status=status.HTTP_400_BAD_REQUEST) 
+
+            serializer = CartSerializer(data=item_data)
+            if serializer.is_valid():
+                new_cart_item = serializer.save(user=user)
+                new_cart_items.append(new_cart_item)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"message": "Cart Items Updated Successfully"}, status=status.HTTP_201_CREATED)
+    
+    elif request.method == 'PUT':
+        update_cart_Items = []
+
+        for item_data in items_data:
+
+            existing_cart_item = Cart.objects.filter(
+            user=user, 
+            product_id=item_data['product_id'], 
+            color=item_data['color']).first()
+
+            if not existing_cart_item:
+                return Response({"message": "Item not found in the cart!"}, status=status.HTTP_404_NOT_FOUND)
+        
+            serializer = CartSerializer(existing_cart_item, data=item_data)
+
+            if serializer.is_valid():
+                update_cart_Item = serializer.save(user=user)
+                update_cart_Items.append(update_cart_Item)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"message": "Cart Items Updated Successfully"}, status=status.HTTP_200_OK)
