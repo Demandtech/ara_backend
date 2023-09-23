@@ -154,6 +154,9 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
+DOMAIN = 'https://ara-shop.vercel.app/'
+SITE_NAME = 'ARA STORE'
+
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
