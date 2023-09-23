@@ -154,7 +154,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-DOMAIN = 'ara-shop.vercel.app'
+DOMAIN = os.getenv('DOMAIN')
 SITE_NAME = 'ARA STORE'
 
 DJOSER = {
