@@ -154,7 +154,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-DOMAIN = 'https://ara-shop.vercel.app'
+DOMAIN = 'ara-shop.vercel.app'
 SITE_NAME = 'ARA STORE'
 
 DJOSER = {
