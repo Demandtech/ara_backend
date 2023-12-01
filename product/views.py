@@ -32,7 +32,7 @@ def product(request):
 
     min_price = products.aggregate(Min('price'))['price__min']
     max_price = products.aggregate(Max('price'))['price__max']
-
+    
     response_data = {
         "current_page": current_page,
         "total_pages": total_pages,
@@ -70,7 +70,7 @@ def category_product(request, category):
     paginator = Pagination()
     paginator.page_size = limit
     paginator.page = page
-    
+
     paginated_products = paginator.paginate_queryset(products, request)
     current_page = paginator.page.number
     total_pages = paginator.page.paginator.num_pages
@@ -101,6 +101,7 @@ def best_seller(request):
 def featured(request):
     products = Product.objects.filter(featured=True)
     serializer = ProductSerializer(products, many=True)
+    print(len(serializer.data))
     return Response(serializer.data)
 
 

@@ -82,15 +82,13 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'PORT': '6543',
+        'PORT': os.getenv('DATABASE_PORT'),
         'HOST': os.getenv('DATABASE_HOST')
     }
 }
-
-
 # 5EH4?$XVN9%#$pR
 
 # Password validation
@@ -187,7 +185,6 @@ EMAIL_PORT = 587
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://localhost:8000',
     'http://127.0.0.1:3000',
     'https://ara-shop.vercel.app',
     # Add other origins if needed
